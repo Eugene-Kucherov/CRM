@@ -1,0 +1,37 @@
+@import "../../styles/variables";
+
+.time {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: "Futura", sans-serif;
+
+  &__header {
+    font-size: 16px;
+    margin: 0;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  &__timezone {
+    font-size: 10px;
+    margin: 0;
+    text-align: center;
+  }
+
+  &.light {
+    background-color: $dark-blue;
+    color: #fff;
+  }
+
+  &.dark {
+    background-color: $grey-bg;
+    color: $dark-blue;
+  }
+}

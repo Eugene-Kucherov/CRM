@@ -1,0 +1,79 @@
+@import "../../styles/variables";
+.deal-form {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 700px;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+
+  form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 30px;
+    column-gap: 20px;
+    div {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      width: 100%;
+      position: relative;
+      input {
+        border: 1px solid #cccccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        padding: 10px;
+        width: 100%;
+        &:focus {
+          + label {
+            top: -10px;
+            transform: translateY(-50%) scale(0.7);
+            opacity: 1;
+          }
+        }
+        &:not(:placeholder-shown) + label {
+          top: -10px;
+          transform: translateY(-50%) scale(0.7);
+          opacity: 1;
+        }
+      }
+      label {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 10px;
+        transform-origin: left center;
+        pointer-events: none;
+        transition: 0.3s ease-in-out;
+        color: black;
+        opacity: 0.5;
+      }
+    }
+    select {
+      border: 1px solid #cccccc;
+      border-radius: 5px;
+      width: 50%;
+    }
+    .form-actions {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      button {
+        align-self: flex-end;
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

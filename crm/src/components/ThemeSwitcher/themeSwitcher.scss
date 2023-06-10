@@ -1,0 +1,77 @@
+@import "../../styles/variables";
+
+.theme-switch {
+  display: inline-block;
+  position: relative;
+  width: 50px;
+  height: 24px;
+
+  input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+
+    &:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    .round {
+      width: 50px;
+    }
+  }
+
+  &.light {
+    .slider {
+      background-color: #ccc;
+
+      &:before {
+        background-color: black;
+      }
+    }
+
+    input[type="checkbox"]:checked + .slider {
+      background-color: #2196f3;
+    }
+  }
+
+  &.dark {
+    .slider {
+      background-color: #2196f3;
+
+      &:before {
+        background-color: white;
+      }
+    }
+
+    input[type="checkbox"]:checked + .slider {
+      background-color: #ccc;
+    }
+  }
+
+  input[type="checkbox"]:focus + .slider {
+    box-shadow: 0 0 1px #2196f3;
+  }
+
+  input[type="checkbox"]:checked + .slider:before {
+    transform: translateX(26px);
+  }
+}

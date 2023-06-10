@@ -1,0 +1,66 @@
+.deals-by-stage {
+  border-collapse: collapse;
+  width: 100%;
+
+  th,
+  td {
+    border: 1px solid #e6e6e6;
+    padding: 10px;
+    text-align: center;
+    width: 20%;
+  }
+
+  th {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  td {
+    vertical-align: top;
+  }
+
+  .deal-list {
+    margin: 0;
+    list-style-type: none;
+    padding: 0;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .deal-list li {
+    background-color: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 16px;
+    padding: 10px;
+  }
+
+  .deal-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  .deal-list li a {
+    color: #0a2540;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .deal-list li a:hover {
+    text-decoration: underline;
+  }
+
+  .deal-list li span {
+    color: #8e8e8e;
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .deal-list li:hover {
+    cursor: grab;
+  }
+}

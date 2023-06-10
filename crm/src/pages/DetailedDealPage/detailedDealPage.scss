@@ -1,0 +1,48 @@
+@import "../../styles/variables";
+
+.deal-details {
+  padding: 70px 100px 50px 50px;
+  h1 {
+    font-size: 30px;
+    margin: 0 0 20px;
+    text-align: center;
+  }
+
+  ul {
+    width: 70%;
+    list-style: none;
+    margin-bottom: 20px;
+    padding: 0;
+
+    li {
+      margin-bottom: 15px;
+      height: 30px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      span {
+        font-weight: bold;
+        white-space: nowrap;
+      }
+    }
+    .created {
+      margin-bottom: 20px;
+      span {
+        font-weight: bold;
+        white-space: nowrap;
+      }
+    }
+    .deal-stage {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+  .deal-actions {
+    width: 70%;
+    display: flex;
+    justify-content: space-between;
+  }
+}

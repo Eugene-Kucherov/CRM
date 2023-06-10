@@ -1,0 +1,15 @@
+@import "../../styles/variables";
+.deals-page {
+  padding: 50px 100px 50px 50px;
+  h1 {
+    font-size: 30px;
+    margin: 0;
+    text-align: center;
+  }
+  &-buttons {
+    height: 35px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+}

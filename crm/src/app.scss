@@ -1,0 +1,20 @@
+@import "./styles/variables";
+
+.main {
+  display: flex;
+
+  &.light {
+    background-color: $grey-bg;
+    color: #000000;
+  }
+
+  &.dark {
+    background-color: $dark-blue;
+    color: #ffffff;
+  }
+}
+
+.outlet {
+  position: relative;
+  width: calc(100% - 200px);
+}

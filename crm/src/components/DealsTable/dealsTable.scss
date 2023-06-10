@@ -1,0 +1,120 @@
+@import "../../styles/variables";
+
+.deals-table-container {
+  height: 550px;
+  display: flex;
+  flex-direction: column;
+}
+
+.deals-table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.deals-table-search {
+  display: flex;
+  width: 50%;
+  align-items: center;
+
+  input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    flex: 1;
+  }
+
+  select {
+    margin-left: 10px;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+}
+
+.deals-table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+
+  th {
+    padding: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    &:first-child {
+      width: 20%;
+    }
+    &:nth-child(2) {
+      width: 40%;
+    }
+    &:nth-child(3) {
+      width: 40%;
+    }
+  }
+
+  td {
+    padding: 12px;
+    font-size: 14px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  a {
+    color: #0a2540;
+    font-weight: 600;
+    text-decoration: none;
+    display: block;
+
+    &.dark {
+      color: white;
+    }
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+
+  button {
+    margin: 0 5px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &.active {
+      background-color: $dark-blue;
+      color: $grey-bg;
+      border-color: #e0e0e0;
+    }
+
+    &.dark {
+      background-color: $dark-blue;
+      color: $grey-bg;
+      &.active {
+        background-color: $grey-bg;
+        color: $dark-blue;
+      }
+      &:hover:not(.active) {
+        background-color: $grey-bg;
+        color: $dark-blue;
+      }
+    }
+
+    &:hover:not(.active) {
+      background-color: #e0e0e0;
+    }
+  }
+}

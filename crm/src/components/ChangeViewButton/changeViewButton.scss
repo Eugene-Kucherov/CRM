@@ -1,0 +1,25 @@
+@import "../../styles/variables";
+
+.toggle-button {
+  transition: background-color 0.3s;
+  &.light {
+    background-color: $grey-bg !important;
+    color: $dark-blue !important;
+    &:hover,
+    &.Mui-selected {
+      background-color: $dark-blue !important;
+      color: #fff !important;
+    }
+  }
+
+  &.dark {
+    background-color: $dark-blue !important;
+    color: #fff !important;
+    border: 1px solid white;
+    &:hover,
+    &.Mui-selected {
+      background-color: $grey-bg !important;
+      color: $dark-blue !important;
+    }
+  }
+}

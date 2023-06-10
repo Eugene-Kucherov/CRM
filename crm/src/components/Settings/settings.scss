@@ -1,0 +1,20 @@
+.settings {
+  position: relative;
+  margin-bottom: 20px;
+
+  &__button {
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  &__options {
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
