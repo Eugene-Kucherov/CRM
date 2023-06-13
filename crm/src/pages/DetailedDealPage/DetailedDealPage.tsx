@@ -54,9 +54,9 @@ const DetailedDealPage = () => {
 
   const handleConfirmDelete = async () => {
     await deleteDeal();
-    showAlert(`${t("deal")} ${deal?.name} ${t("deleted_deal")}`, "warning");
-    navigate("/deals");
+    showAlert(`${t("deal")} "${deal?.name}" ${t("deleted")}`, "warning");
     handleCloseModal();
+    navigate("/deals");
   };
 
   const handleUpdateField = async (field: string, value: string) => {

@@ -1,11 +1,20 @@
 import "./dealForm.scss";
-import { FormEvent, useContext, useState } from "react";
+import {
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useContext,
+  useState,
+} from "react";
 import Input from "../Input/Input";
 import useInput from "../../hooks/useInput";
 import { AlertContext } from "../../context/AlertContextProvider";
 import CustomButton from "../CustomButton/CustomButton";
 import useTranslate from "../../hooks/useTranslate";
 import useFetch from "../../hooks/useFetch";
+import { setDeals } from "../../store/dealsSlice";
+import { useDispatch } from "react-redux";
+import { IDeal } from "../../types";
 
 const initialValues = {
   name: "",
@@ -18,11 +27,11 @@ const initialValues = {
 
 interface DealFormProps {
   userId: string;
-  onClose: () => void;
-  onUpdate: () => void;
+  getDeals: () => Promise<Array<IDeal>>;
+  setShowForm: Dispatch<SetStateAction<boolean>>;
 }
 
-const DealForm = ({ userId, onClose, onUpdate }: DealFormProps) => {
+const DealForm = ({ userId, getDeals, setShowForm }: DealFormProps) => {
   const [fields, handleChange] = useInput(initialValues);
   const { showAlert } = useContext(AlertContext);
   const { t } = useTranslate();
@@ -32,6 +41,7 @@ const DealForm = ({ userId, onClose, onUpdate }: DealFormProps) => {
     stage: selectedStage,
     ...fields,
   });
+  const dispatch = useDispatch();
 
   const inputFields = [
     { label: `${t("name")} (${t("required")})`, name: "name", type: "text" },
@@ -55,22 +65,24 @@ const DealForm = ({ userId, onClose, onUpdate }: DealFormProps) => {
 
     if (fields.name) {
       await createDeal();
-      onUpdate();
+      const newDeals = await getDeals();
+      dispatch(setDeals(newDeals));
       showAlert(
-        `${t("deal")} ${fields.name} ${t("added_successfully")}`,
+        `${t("deal")} "${fields.name}" ${t("saved_successfully")}`,
         "success"
       );
     } else {
       showAlert(`Name ${t("required_fields")}`, "error");
       return;
     }
-    onClose();
+    setShowForm(false);
   };
 
   const closeForm = () => {
-    onClose();
+    setShowForm(false);
   };
 
+  
   return (
     <div className="deal-form">
       <form onSubmit={handleSubmit}>

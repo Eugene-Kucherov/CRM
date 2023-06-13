@@ -1,6 +1,8 @@
 const UserService = require("../service/user");
+const TokenService = require("../service/token");
 const DealService = require("../service/deal");
 const PhotoService = require("../service/photo");
+const EventService = require("../service/event");
 const UserModel = require("../models/user");
 
 class UserController {
@@ -86,7 +88,7 @@ class UserController {
       const user = await UserService.getUser(userId);
       return res.json(user);
     } catch (error) {
-      res.status(404).json({ error: "An error occurred while loading data" });
+      res.status(404).json({ error: error.message });
     }
   }
 
@@ -104,9 +106,12 @@ class UserController {
   async deleteUser(req, res) {
     try {
       const { userId } = req.params;
+      const { refreshToken } = req.cookies;
       await UserService.deleteUser(userId);
-      await DealService.deleteDealsByUser(userId);
+      await TokenService.removeToken(refreshToken);
       await PhotoService.deletePhotoByUserId(userId);
+      await EventService.deleteEventsByUserId(userId);
+      await DealService.deleteDealsByUserId(userId);
       return res.sendStatus(200);
     } catch (error) {
       res.status(404).json({ error: "Failed to delete your account" });

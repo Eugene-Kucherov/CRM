@@ -114,18 +114,20 @@ class UserService {
     };
   }
   async checkAuth(token) {
+    if (!token) {
+      throw new Error("You are not authorized");
+    }
     const accessToken = token.split(" ")[1];
-    if (
-      !token ||
-      !accessToken ||
-      !tokenService.validateAccessToken(accessToken)
-    ) {
+    if (!accessToken || !tokenService.validateAccessToken(accessToken)) {
       throw new Error("You are not authorized");
     }
   }
 
   async getUser(id) {
     const user = await UserModel.findById(id);
+    if (!user) {
+      throw new Error("An error occurred while loading data");
+    }
     const userDto = new UserDto(user);
     return userDto;
   }

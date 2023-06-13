@@ -30,7 +30,7 @@ class DealService {
     const dealDto = new DealDto(updatedDeal);
     return dealDto;
   }
-  async deleteDealsByUser(userId) {
+  async deleteDealsByUserId(userId) {
     await DealModel.deleteMany({ userId: userId });
   }
   async deleteDeal(id) {

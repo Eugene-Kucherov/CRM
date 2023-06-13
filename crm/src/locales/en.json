@@ -26,8 +26,8 @@
   "save": "Save",
   "deals": "Deals",
   "deal": "Deal",
-  "added_successfully": "added successfully",
-  "deleted_deal": "has been deleted",
+  "saved_successfully": "saved successfully",
+  "deleted": "has been deleted",
   "deleted_user": "Your account has been deleted",
   "confirm_delete": "Confirm deletion",
   "confirm_delete_account": "Are you sure you want to delete your account?",
@@ -70,5 +70,7 @@
   "activated": "Activated",
   "not_activated": "Not activated",
   "upload_photo": "upload photo",
-  "delete_photo": "delete photo"
+  "delete_photo": "delete photo",
+  "title": "Title"
 }
+

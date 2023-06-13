@@ -7,9 +7,12 @@
     text-align: center;
   }
   &-buttons {
-    height: 35px;
+    height: 30px;
     display: flex;
     justify-content: space-between;
     margin-bottom: 10px;
+    button {
+      font-size: 12px;
+    }
   }
 }

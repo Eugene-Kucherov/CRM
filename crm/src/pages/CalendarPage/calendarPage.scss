@@ -1,147 +1,184 @@
 @import "react-big-calendar/lib/css/react-big-calendar.css";
 @import "../../styles/variables";
 
-.rbc-calendar {
-  padding: 70px 100px 50px 50px;
-  font-family: "Futura", sans-serif;
-  font-size: 16px;
+.calendar-page {
+  position: relative;
 
-  .rbc-toolbar {
-    button {
-      cursor: pointer;
-      font-family: "Futura", sans-serif;
-      background-color: $green;
-      border-color: $green;
+  .delete-button {
+    font-size: 12px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .rbc-calendar {
+    padding: 70px 100px 50px 50px;
+    font-family: "Futura", sans-serif;
+    font-size: 16px;
+
+    .rbc-toolbar {
+      button {
+        cursor: pointer;
+        font-family: "Futura", sans-serif;
+        background-color: $blue;
+        border-color: $blue;
+        color: $grey-bg;
+
+        &:active,
+        &:hover {
+          background-color: $dark-blue !important;
+          border-color: $dark-blue !important;
+          color: $grey-bg !important;
+        }
+      }
+
+      .rbc-active {
+        background-color: $dark-blue !important;
+        border-color: $dark-blue !important;
+        color: $grey-bg !important;
+      }
+    }
+
+    .rbc-header {
+      font-weight: 500;
+    }
+
+    .rbc-date-cell {
+      font-weight: 300;
+      font-size: 14px;
+      button {
+        font-family: "Futura", sans-serif;
+      }
+    }
+
+    .rbc-event {
+      background-color: pink;
+      border-color: pink;
       color: #fff;
 
       &:active,
       &:hover {
-        background-color: $dark-green !important;
-        border-color: $dark-green !important;
-        color: #fff !important;
+        background-color: $pink;
+        border-color: $pink;
       }
     }
 
-    .rbc-active {
-      background-color: $dark-green !important;
-      border-color: $dark-green !important;
-      color: #fff !important;
-    }
-  }
-
-  .rbc-header {
-    font-weight: 500;
-  }
-
-  .rbc-date-cell {
-    font-weight: 300;
-    font-size: 14px;
-    button {
-      font-family: "Futura", sans-serif;
-    }
-  }
-
-  .rbc-event {
-    background-color: $green;
-    border-color: $green;
-    color: #fff;
-
-    &:active,
-    &:hover {
-      background-color: $dark-green;
-      border-color: $dark-green;
-    }
-  }
-
-  .rbc-today {
-    font-weight: bold;
-    background-color: pink;
-  }
-
-  .rbc-selected {
-    background-color: $dark-green;
-    border-color: $dark-green;
-    color: #fff;
-  }
-
-  .rbc-show-more {
-    background-color: $green;
-    border-color: $green;
-    color: #fff;
-  }
-
-  .rbc-month-row {
-    display: flex;
-    justify-content: space-between;
-
-    + .rbc-month-row {
-      margin-top: 10px;
-    }
-  }
-
-  .rbc-month-header {
-    text-transform: uppercase;
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  .rbc-month-view {
-    border: none;
-  }
-
-  .rbc-event-content {
-    white-space: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 14px;
-    font-weight: 500;
-    color: white;
-  }
-
-  .rbc-event-label {
-    display: none;
-  }
-
-  .rbc-time-view {
-    border: none;
-
-    .rbc-time-header {
-      display: none;
+    .rbc-today {
+      background-color: rgb(193, 193, 193);
     }
 
-    .rbc-time-content {
-      font-size: 14px;
-      font-weight: 300;
-      color: #333;
+    .rbc-selected {
+      background-color: $pink;
+      border-color: $pink;
+      color: #fff;
     }
 
-    .rbc-agenda-time-cell {
-      padding: 10px;
+    .rbc-show-more {
+      background-color: $blue;
+      border-color: $blue;
+      color: #fff;
+    }
+
+    .rbc-month-row {
+      display: flex;
+      justify-content: space-between;
+
+      + .rbc-month-row {
+        margin-top: 10px;
+      }
+      .rbc-off-range-bg {
+        background-color: inherit;
+      }
+    }
+
+    .rbc-month-header {
+      text-transform: uppercase;
       font-size: 14px;
       font-weight: 500;
-      color: #333;
     }
 
-    .rbc-agenda-date-cell {
-      padding: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .rbc-agenda-cell {
-      padding: 10px;
+    .rbc-month-view {
       border: none;
-      border-bottom: 1px solid #e8e8e8;
     }
 
-    .rbc-agenda-content {
+    .rbc-event-content {
       white-space: normal;
       overflow: hidden;
       text-overflow: ellipsis;
       font-size: 14px;
-      font-weight: 300;
-      color: #333;
+      font-weight: 500;
+      color: white;
+    }
+
+    .rbc-event-label {
+      display: none;
+    }
+
+    .rbc-time-view {
+      border: none;
+
+      .rbc-time-header {
+        display: none;
+      }
+
+      .rbc-time-content {
+        font-size: 14px;
+        font-weight: 300;
+        .rbc-current-time-indicator {
+          background-color: $dark-blue;
+        }
+      }
+
+      .rbc-agenda-time-cell {
+        padding: 10px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .rbc-agenda-date-cell {
+        padding: 10px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .rbc-agenda-cell {
+        padding: 10px;
+        border: none;
+        border-bottom: 1px solid #e8e8e8;
+      }
+
+      .rbc-agenda-content {
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 14px;
+        font-weight: 300;
+      }
+    }
+  }
+  &.dark {
+    .rbc-calendar {
+      .rbc-toolbar {
+        button {
+          cursor: pointer;
+          font-family: "Futura", sans-serif;
+          background-color: $dark-blue;
+          border-color: $grey-bg;
+          color: $grey-bg;
+
+          &:active,
+          &:hover {
+            background-color: $grey-bg !important;
+            border-color: $grey-bg !important;
+            color: $dark-blue !important;
+          }
+        }
+
+        .rbc-active {
+          background-color: $grey-bg !important;
+          border-color: $grey-bg !important;
+          color: $dark-blue !important;
+        }
+      }
     }
   }
 }

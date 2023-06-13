@@ -9,24 +9,19 @@ import ModalConfirm from "../../components/ModalConfirm/ModalConfirm";
 import { useNavigate } from "react-router";
 import useFetch from "../../hooks/useFetch";
 import ProfilePhoto from "../../components/ProfilePhoto/ProfilePhoto";
-
-export type ProfilePhotoType = {
-  fileName: string;
-  photoData: string;
-} | null;
+import { useDispatch } from "react-redux";
+import { setName } from "../../store/initialsSlice";
 
 const PersonalPage = () => {
   const [user, setUser] = useState<IUserDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = JSON.parse(localStorage.getItem("userId")!);
   const navigate = useNavigate();
-  const [photo, setPhoto] = useState<ProfilePhotoType>(null);
+  const dispatch = useDispatch();
 
   const getUser = useFetch("get", `/users/${userId}`);
   const updateUser = useFetch("patch", `/users/${userId}`);
   const deleteUser = useFetch("delete", `/users/${userId}`);
-
-  const getPhoto = useFetch("get", `/photos/${userId}`);
 
   const { t } = useTranslate();
   const { showAlert } = useContext(AlertContext);
@@ -35,8 +30,6 @@ const PersonalPage = () => {
     const fetchUser = async () => {
       const fetchedUser: IUserDetails = await getUser();
       setUser(fetchedUser);
-      const fetchedPhoto = await getPhoto();
-      setPhoto(fetchedPhoto);
     };
     fetchUser();
   }, []);
@@ -51,8 +44,9 @@ const PersonalPage = () => {
 
   const handleConfirmDelete = async () => {
     await deleteUser();
-    showAlert(t("deleted_user"), "warning");
     navigate("/auth");
+    localStorage.clear();
+    showAlert(t("deleted_user"), "warning");
     handleCloseModal();
   };
 
@@ -60,6 +54,9 @@ const PersonalPage = () => {
     await updateUser({ field, value });
     const updatedUser = await getUser();
     setUser(updatedUser);
+    if (field === "name") {
+      dispatch(setName(updatedUser.name));
+    }
   };
 
   const fieldDefinitions = [
@@ -80,12 +77,7 @@ const PersonalPage = () => {
       />
       <div className="user-details">
         <h1>{t("user_details")}</h1>
-        <ProfilePhoto
-          userId={userId}
-          photo={photo}
-          setPhoto={setPhoto}
-          getPhoto={getPhoto}
-        />
+        <ProfilePhoto userId={userId} />
         {user && (
           <ul>
             <span

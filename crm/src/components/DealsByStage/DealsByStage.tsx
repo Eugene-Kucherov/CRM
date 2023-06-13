@@ -2,44 +2,32 @@ import "./dealsByStage.scss";
 import { Link } from "react-router-dom";
 import { IDeal } from "../../types";
 import useTranslate from "../../hooks/useTranslate";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
+import { setDeals } from "../../store/dealsSlice";
+import { useDispatch } from "react-redux";
 
 type DealsByStageProps = {
-  userId: string;
-  updateDeals: boolean;
-  setUpdateDeals: Dispatch<SetStateAction<boolean>>;
+  deals: Array<IDeal>;
+  getDeals: () => Promise<Array<IDeal>>;
 };
 
-const DealsByStage = ({
-  userId,
-  updateDeals,
-  setUpdateDeals,
-}: DealsByStageProps) => {
-  const [deals, setDeals] = useState<Array<IDeal>>([]);
+const DealsByStage = ({ deals, getDeals }: DealsByStageProps) => {
   const dealsByStage: { [key: number]: Array<IDeal> } = {};
   const [draggedDeal, setDraggedDeal] = useState<IDeal | null>(null);
-
-  const updateDeal = useFetch("patch", `/deal/${draggedDeal?.id}`);
-  const getDeals = useFetch("get", `/deals/${userId}`);
-
+  const dispatch = useDispatch();
   const { t } = useTranslate();
 
+  const updateDeal = useFetch("patch", `/deal/${draggedDeal?.id}`);
+
   useEffect(() => {
-    const fetchDeals = async () => {
-      const fetchedDeals: Array<IDeal> = await getDeals();
-      const sortedDeals = fetchedDeals.sort((a, b) => {
-        const dateA = new Date(a.updated_at);
-        const dateB = new Date(b.updated_at);
-        return dateA.getTime() - dateB.getTime();
-      });
-      setDeals(sortedDeals);
-    };
-    fetchDeals();
-    if (updateDeals) {
-      setUpdateDeals(false);
-    }
-  }, [updateDeals]);
+    const sortedDeals = [...deals].sort((a, b) => {
+      const dateA = new Date(a.updated_at);
+      const dateB = new Date(b.updated_at);
+      return dateA.getTime() - dateB.getTime();
+    });
+    setDeals(sortedDeals);
+  }, []);
 
   const handleDragStart = (deal: IDeal) => {
     setDraggedDeal(deal);
@@ -55,14 +43,10 @@ const DealsByStage = ({
         await updateDeal({ field: "stage", value: stageId });
         await updateDeal({ field: "updated_at", value: new Date() });
         const updatedDeals = await getDeals();
-        setDeals(updatedDeals);
+        dispatch(setDeals(updatedDeals));
       }
       setDraggedDeal(null);
     }
-  };
-
-  const getTime = (deal: IDeal) => {
-    console.log(deal.created_at);
   };
 
   const STAGES = [
@@ -108,7 +92,6 @@ const DealsByStage = ({
                     key={deal.id}
                     draggable
                     onDragStart={() => handleDragStart(deal)}
-                    onClick={() => getTime(deal)}
                   >
                     <Link to={`/deals/${deal.id}`}>{deal.name}</Link>
                     <span>{deal.company}</span>

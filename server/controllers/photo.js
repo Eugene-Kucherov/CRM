@@ -16,7 +16,6 @@ class PhotoController {
   async getPhoto(req, res) {
     try {
       const { userId } = req.params;
-
       const photo = await PhotoService.getPhotoByUserId(userId);
       return res.status(200).json(photo);
     } catch (error) {
@@ -30,7 +29,6 @@ class PhotoController {
       await PhotoService.deletePhotoByUserId(userId);
       return res.sendStatus(200);
     } catch (error) {
-      console.log(error);
       return res.status(500).json({ error: error.message });
     }
   }

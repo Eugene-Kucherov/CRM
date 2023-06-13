@@ -3,67 +3,44 @@ import { IDeal } from "../../types";
 import { Link } from "react-router-dom";
 import useTranslate from "../../hooks/useTranslate";
 import { useTypedSelector } from "../../store";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import useFetch from "../../hooks/useFetch";
+import { useEffect, useMemo, useState } from "react";
 
 type DealsTableProps = {
-  userId: string;
-  updateDeals: boolean;
-  setUpdateDeals: Dispatch<SetStateAction<boolean>>;
+  deals: Array<IDeal>;
 };
 
-const DealsTable = ({
-  userId,
-  updateDeals,
-  setUpdateDeals,
-}: DealsTableProps) => {
-  const [deals, setDeals] = useState<Array<IDeal>>([]);
+const DealsTable = ({ deals }: DealsTableProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCriteria, setSearchCriteria] = useState("name");
   const [searchResults, setSearchResults] = useState<Array<IDeal>>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const { t } = useTranslate();
   const currentTheme = useTypedSelector((state) => state.theme.currentTheme);
-
-  const getDeals = useFetch("get", `/deals/${userId}`);
   const dealsPerPage = 10;
 
-  useEffect(() => {
-    const fetchDeals = async () => {
-      const fetchedDeals: Array<IDeal> = await getDeals();
-      setDeals(fetchedDeals);
-    };
-    fetchDeals();
-    if (updateDeals) {
-      setUpdateDeals(false);
+  const filteredDeals = useMemo(() => {
+    if (searchQuery || searchCriteria) {
+      return deals.filter((deal) => {
+        const query = searchQuery.toLowerCase();
+        const criteria = searchCriteria.toLowerCase();
+        return deal[criteria].toString().toLowerCase().includes(query);
+      });
+    } else {
+      return [];
     }
-  }, [updateDeals]);
+  }, [searchQuery, searchCriteria, deals]);
 
-  const searchDeals = () => {
-    const filteredDeals = deals.filter((deal) => {
-      const query = searchQuery.toLowerCase();
-      const criteria = searchCriteria.toLowerCase();
-      return deal[criteria].toString().toLowerCase().includes(query);
-    });
-
+  useEffect(() => {
     setSearchResults(filteredDeals);
     setCurrentPage(1);
-  };
-
-  useEffect(() => {
-    if (searchQuery || searchCriteria) {
-      searchDeals();
-    } else {
-      setSearchResults([]);
-    }
-  }, [searchQuery, searchCriteria]);
+  }, [filteredDeals]);
 
   const indexOfLastDeal = currentPage * dealsPerPage;
   const indexOfFirstDeal = indexOfLastDeal - dealsPerPage;
   const currentDeals = searchResults.length > 0 ? searchResults : deals;
-  const currentDealsOnPage = currentDeals.slice(
-    indexOfFirstDeal,
-    indexOfLastDeal
+  const currentDealsOnPage = useMemo(
+    () => filteredDeals.slice(indexOfFirstDeal, indexOfLastDeal),
+    [filteredDeals, indexOfFirstDeal, indexOfLastDeal]
   );
   const totalPages = Math.ceil(currentDeals.length / dealsPerPage);
   const pageNumbers = Array.from(

@@ -6,6 +6,8 @@ import useTranslate from "../../hooks/useTranslate";
 import CustomButton from "../CustomButton/CustomButton";
 import { useNavigate } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
+import { IconButton, InputAdornment } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const SignUp = () => {
   const initialValues = {
@@ -16,10 +18,11 @@ const SignUp = () => {
   };
   const [fields, handleChange] = useInput(initialValues);
   const [submitted, setSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { showAlert } = useContext(AlertContext);
   const { t } = useTranslate();
   const navigate = useNavigate();
-
   const { name, email, password, confirmPassword } = fields;
   const registerUser = useFetch("post", "/registration", {
     name,
@@ -37,8 +40,18 @@ const SignUp = () => {
     );
 
     if (emptyFields.length > 0) {
-      const fieldNames = emptyFields.join(", ");
-      showAlert(`${fieldNames} ${t("required_fields")}`, "error");
+      const emptyFieldLabels = emptyFields.map((fieldName) => {
+        const fieldDefinition = fieldDefinitions.find(
+          (field) => field.name === fieldName
+        );
+        return fieldDefinition ? fieldDefinition.label : fieldName;
+      });
+      showAlert(
+        `${emptyFieldLabels.join(", ")} ${t(
+          "required_fields"
+        )}`,
+        "error"
+      );
       return;
     }
 
@@ -59,26 +72,38 @@ const SignUp = () => {
 
   const isFieldEmpty = (fieldName: string) => submitted && !fields[fieldName];
 
+  const toggleShowPassword = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+
+  const toggleShowConfirmPassword = () => {
+    setShowConfirmPassword(
+      (prevShowConfirmPassword) => !prevShowConfirmPassword
+    );
+  };
+
   const fieldDefinitions = [
     {
-      label: `${t("name")}:`,
+      label: `${t("name")}`,
       name: "name",
       type: "text",
     },
     {
-      label: `${t("email")}:`,
+      label: `${t("email")}`,
       name: "email",
       type: "email",
     },
     {
-      label: `${t("password")}:`,
+      label: `${t("password")}`,
       name: "password",
-      type: "password",
+      type: showPassword ? "text" : "password",
+      togglePassword: toggleShowPassword,
     },
     {
-      label: `${t("confirm_password")}:`,
+      label: `${t("confirm_password")}`,
       name: "confirmPassword",
-      type: "password",
+      type: showConfirmPassword ? "text" : "password",
+      togglePassword: toggleShowConfirmPassword,
     },
   ];
 
@@ -86,7 +111,7 @@ const SignUp = () => {
     <form onSubmit={handleSubmit}>
       <h1>{t("registration")}</h1>
       <p>{t("fill_in_fields")}</p>
-      {fieldDefinitions.map(({ label, name, type }) => (
+      {fieldDefinitions.map(({ label, name, type, togglePassword }) => (
         <Input
           key={name}
           label={label}
@@ -97,6 +122,17 @@ const SignUp = () => {
           onChange={handleChange}
           isFieldEmpty={isFieldEmpty(name)}
           placeholder=" "
+          endAdornment={
+            (name === "password" || name === "confirmPassword") && (
+              <IconButton
+                onClick={togglePassword}
+                edge="end"
+                className="password-toggle"
+              >
+                {type === "password" ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            )
+          }
         />
       ))}
       <CustomButton className="auth-button" type="submit">

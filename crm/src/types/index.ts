@@ -15,6 +15,20 @@ export interface IUserDetails {
   [key: string]: number | string | boolean;
 }
 
+export interface IProfilePhoto {
+  fileName: string;
+  photoData: string;
+};
+
+export interface IEvent {
+  userId: number;
+  id: number;
+  title: string;
+  start: Date;
+  end: Date;
+  [key: string]: number | string | Date;
+}
+
 export interface IDeal {
   userId: number;
   id: number;

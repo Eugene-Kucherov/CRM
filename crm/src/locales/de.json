@@ -26,8 +26,8 @@
   "save": "Speichern",
   "deals": "Deals",
   "deal": "Deal",
-  "added_successfully": "erfolgreich hinzugefügt",
-  "deleted_deal": "wurde gelöscht",
+  "saved_successfully": "erfolgreich gespeichert",
+  "deleted": "wurde gelöscht",
   "deleted_user": "Dein Account wurde gelöscht",
   "confirm_delete": "Löschung bestätigen",
   "confirm_delete_account": "Möchten Sie Ihren Account wirklich löschen?",
@@ -70,5 +70,6 @@
   "activated": "Aktiviert",
   "not_activated": "Nicht aktiviert",
   "upload_photo": "Foto hochladen",
-  "delete_photo": "Foto löschen"
+  "delete_photo": "Foto löschen",
+  "title": "Titel"
 }

@@ -1,15 +1,15 @@
 import { useContext, useEffect } from "react";
 import useTranslate from "./useTranslate";
 import { AlertContext } from "../context/AlertContextProvider";
-import { Event } from "../pages/CalendarPage/CalendarPage";
+import { IEvent } from "../types";
 
-//сделал как хук, потому что только в App заюзаю
-const useEventNotifications = (calendarEvents: Event[]) => {
+const useEventNotifications = (calendarEvents: Array<IEvent> | undefined) => {
   const { showAlert } = useContext(AlertContext);
   const { t } = useTranslate();
 
-  const getTimeUntilEvent = (event: Event) => {
-    const diff = event.start.getTime() - new Date().getTime();
+  const getTimeUntilEvent = (event: IEvent) => {
+    const eventStart = new Date(event.start);
+    const diff = eventStart.getTime() - new Date().getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
     const seconds = Math.floor((diff / 1000) % 60);
@@ -18,7 +18,7 @@ const useEventNotifications = (calendarEvents: Event[]) => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      calendarEvents.forEach((event) => {
+      calendarEvents?.forEach((event) => {
         const { hours, minutes, seconds } = getTimeUntilEvent(event);
         if (hours === 23 && minutes === 59 && seconds === 59) {
           showAlert(
@@ -39,7 +39,7 @@ const useEventNotifications = (calendarEvents: Event[]) => {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [calendarEvents, showAlert, t]);
+  }, [calendarEvents]);
 };
 
 export default useEventNotifications;

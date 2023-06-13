@@ -1,4 +1,5 @@
 import { ChangeEvent } from "react";
+import { InputAdornment } from "@mui/material";
 
 type InputProps = {
   id: string;
@@ -10,6 +11,7 @@ type InputProps = {
   isFieldEmpty?: boolean;
   label?: string;
   placeholder?: string;
+  endAdornment?: React.ReactNode; // Optional prop for end adornment
 };
 
 const Input = ({
@@ -22,6 +24,7 @@ const Input = ({
   isFieldEmpty = false,
   label = "",
   placeholder = " ",
+  endAdornment,
 }: InputProps) => {
   return (
     <div>
@@ -35,6 +38,11 @@ const Input = ({
         placeholder={placeholder}
       />
       {label && <label htmlFor={id}>{label}</label>}
+      {endAdornment && (
+        <InputAdornment position="end" className="end-adornment">
+          {endAdornment}
+        </InputAdornment>
+      )}
     </div>
   );
 };
