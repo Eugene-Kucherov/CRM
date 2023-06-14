@@ -72,7 +72,7 @@ const DealsTable = ({ deals }: DealsTableProps) => {
         </div>
         <span>
           {t("numder_of_searched_deals")}:{" "}
-          {(searchQuery && searchResults.length) || deals.length}
+          {searchQuery ? searchResults.length : deals.length}
         </span>
       </div>
       <table className="deals-table">

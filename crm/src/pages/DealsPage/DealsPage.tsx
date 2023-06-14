@@ -58,10 +58,11 @@ const DealsPage = () => {
           {t("add_new_deal")}
         </CustomButton>
       </div>
-      {displayType === "stage" && (
+      {Array.isArray(deals) && displayType === "stage" && (
         <DealsByStage deals={deals} getDeals={getDeals} />
       )}
-      {displayType === "table" && (
+
+      {Array.isArray(deals) && displayType === "table" && (
         <DealsTable deals={deals} />
       )}
       {showForm && (
