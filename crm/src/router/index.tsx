@@ -13,6 +13,7 @@ import DealsPage from "../pages/DealsPage/DealsPage";
 import DetailedDealPage from "../pages/DetailedDealPage/DetailedDealPage";
 import AnimationPage from "../pages/AnimationPage/AnimationPage";
 import ActivationPage from "../pages/ActivationPage/ActivationPage";
+import MessagesPage from "../pages/MessagesPage/MessagesPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +25,7 @@ const router = createBrowserRouter(
           <Route path="calendar" element={<CalendarPage />} />
           <Route path="deals" element={<DealsPage />} />
           <Route path="deals/:dealId" element={<DetailedDealPage />} />
+          <Route path="messages" element={<MessagesPage />} />
         </Route>
         <Route path="/auth" element={<AuthPage />} />
         <Route path="*" element={<NotFound />} />

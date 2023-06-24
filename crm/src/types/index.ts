@@ -5,7 +5,7 @@ export interface IUser {
 }
 
 export interface IUserDetails {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;
@@ -18,11 +18,11 @@ export interface IUserDetails {
 export interface IProfilePhoto {
   fileName: string;
   photoData: string;
-};
+}
 
 export interface IEvent {
-  userId: number;
-  id: number;
+  userId: string;
+  id: string;
   title: string;
   start: Date;
   end: Date;
@@ -30,8 +30,8 @@ export interface IEvent {
 }
 
 export interface IDeal {
-  userId: number;
-  id: number;
+  userId: string;
+  id: string;
   stage: number;
   name: string;
   email: string;
@@ -42,4 +42,12 @@ export interface IDeal {
   created_at: Date;
   updated_at: Date;
   [key: string]: number | string | Date;
+}
+
+export interface IMessage {
+  id: string;
+  sender: string;
+  recipient: string;
+  content: string;
+  created_at: Date;
 }

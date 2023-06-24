@@ -1,6 +1,5 @@
 const UserModel = require("../models/user");
 const bcrypt = require("bcrypt");
-const uuid = require("uuid");
 const tokenService = require("./token");
 const UserDto = require("../dtos/user");
 const nodemailer = require("nodemailer");
@@ -130,6 +129,12 @@ class UserService {
     }
     const userDto = new UserDto(user);
     return userDto;
+  }
+
+  async searchUserByName(name) {
+    const regex = new RegExp(name, "i");
+    const users = await UserModel.find({ name: regex });
+    return users;
   }
 
   async updateUser(id, field, value) {

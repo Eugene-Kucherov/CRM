@@ -10,3 +10,4 @@ router.patch("/:dealId", userController.checkAuth, dealController.updateDeal);
 router.delete("/:dealId", userController.checkAuth, dealController.deleteDeal);
 
 module.exports = router;
+

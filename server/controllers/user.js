@@ -92,6 +92,16 @@ class UserController {
     }
   }
 
+  async searchUser(req, res) {
+    try {
+      const { name } = req.query;
+      const users = await UserService.searchUserByName(name);
+      return res.json(users);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
   async updateUser(req, res) {
     try {
       const { userId } = req.params;

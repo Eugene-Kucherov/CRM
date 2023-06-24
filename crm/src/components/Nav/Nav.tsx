@@ -7,11 +7,13 @@ import Settings from "../Settings/Settings";
 import EventIcon from "@mui/icons-material/Event";
 import PersonIcon from "@mui/icons-material/Person";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
 const navItems = [
   { text: "personal", icon: <PersonIcon />, link: "/personal" },
   { text: "calendar", icon: <EventIcon />, link: "/calendar" },
   { text: "deals", icon: <MonetizationOnIcon />, link: "/deals" },
+  { text: "messages", icon: <ChatBubbleOutlineIcon />, link: "/messages" },
 ];
 
 interface NavProps {}
