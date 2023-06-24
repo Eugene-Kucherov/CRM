@@ -4,7 +4,7 @@ const messageSchema = new Schema({
   sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
   recipient: { type: Schema.Types.ObjectId, ref: "User", required: true },
   content: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
+  created_at: { type: Date, default: Date.now },
 });
 
 messageSchema.statics.getMessagesBetweenUsers = function (
@@ -16,7 +16,7 @@ messageSchema.statics.getMessagesBetweenUsers = function (
       { sender: senderId, recipient: recipientId },
       { sender: recipientId, recipient: senderId },
     ],
-  }).sort({ createdAt: 1 });
+  }).sort({ created_at: 1 });
 };
 
 module.exports = model("Message", messageSchema);

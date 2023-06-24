@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { IMessage } from "../../types";
 import { IUserDetails } from "../../types";
 import useFetch from "../../hooks/useFetch";
+import "./dialogWindow.scss";
 
 interface DialogWindowProps {
   selectedUser: IUserDetails;
@@ -49,7 +50,18 @@ const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
       </div>
       <div className="messages">
         {messages.map((message) => (
-          <div key={message.id}>{message.content}</div>
+          <div
+            key={message.id}
+            className={`message ${message.sender === userId ? "sender" : ""}`}
+          >
+            <div
+              className={`message-content ${
+                message.sender === userId ? "sender" : ""
+              }`}
+            >
+              {message.content}
+            </div>
+          </div>
         ))}
       </div>
       <div className="message-input">
