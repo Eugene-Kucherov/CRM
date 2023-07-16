@@ -6,6 +6,7 @@ class MessageController {
       const messageData = await MessageService.sendMessage(req.body);
       return res.status(201).json(messageData);
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error: "Failed to send message" });
     }
   }
@@ -30,7 +31,15 @@ class MessageController {
     }
   }
 
-  
+  async getDialogues(req, res) {
+    try {
+      const dialogues = await MessageService.getDialogues();
+      console.log(dialogues)
+      return res.status(200).json(dialogues);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve dialogues" });
+    }
+  }
 }
 
 module.exports = new MessageController();

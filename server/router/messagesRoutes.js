@@ -15,5 +15,10 @@ router.delete(
   userController.checkAuth,
   messageController.deleteMessage
 );
+router.get(
+  "/dialogues",
+  userController.checkAuth,
+  messageController.getDialogues
+);
 
 module.exports = router;

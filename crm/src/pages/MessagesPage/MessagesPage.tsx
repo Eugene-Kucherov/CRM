@@ -1,15 +1,17 @@
 import "./messagesPage.scss";
 import { useState, useEffect } from "react";
 import useFetch from "../../hooks/useFetch";
-import { IUserDetails } from "../../types";
+import { IDialog, IUserDetails } from "../../types";
 import DialogWindow from "../../components/DialogWindow/DialogWindow";
 
 const MessagesPage = () => {
   const [searchName, setSearchName] = useState("");
   const [searchResults, setSearchResults] = useState<Array<IUserDetails>>([]);
   const [selectedUser, setSelectedUser] = useState<IUserDetails | null>(null);
+  const [dialogs, setDialogs] = useState<Array<IDialog>>([]);
 
   const searchUser = useFetch("get", `/users?name=${searchName}`);
+  const getDialogs = useFetch("get", `/messages/dialogues`);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -18,6 +20,15 @@ const MessagesPage = () => {
 
     return () => clearTimeout(timer);
   }, [searchName]);
+
+  useEffect(() => {
+    const fetchDialogs = async () => {
+      const fetchedDialogs = await getDialogs();
+      if (fetchedDialogs) setDialogs(fetchedDialogs);
+    };
+
+    fetchDialogs();
+  }, []);
 
   const handleSearch = async () => {
     const users = await searchUser();
@@ -35,6 +46,13 @@ const MessagesPage = () => {
         value={searchName}
         onChange={(e) => setSearchName(e.target.value)}
       />
+      <div>
+        {dialogs.map((dialog) => (
+          <div key={Date.now()}>
+            {dialog.lastMessage.content}
+          </div>
+        ))}
+      </div>
       <div>
         {searchResults.map((user) => (
           <div key={user.email} onClick={() => handleUserClick(user)}>

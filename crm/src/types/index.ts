@@ -52,3 +52,8 @@ export interface IMessage {
   created_at: Date;
   is_deleted: boolean;
 }
+
+export interface IDialog {
+  user: IUserDetails;
+  lastMessage: IMessage;
+}
