@@ -12,6 +12,9 @@ interface DialogWindowProps {
 const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
   const [messageContent, setMessageContent] = useState("");
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
+    null
+  );
   const userId = JSON.parse(localStorage.getItem("userId")!);
   const messageData = {
     sender: userId,
@@ -23,13 +26,12 @@ const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
     "get",
     `/messages/${userId}/${selectedUser._id}`
   );
+  const deleteMessage = useFetch("delete", `/messages/${selectedMessageId}`);
 
   useEffect(() => {
     const fetchMessages = async () => {
       const messages = await getMessages();
-      if (messages) {
-        setMessages(messages);
-      }
+      setMessages(messages);
     };
     fetchMessages();
   }, []);
@@ -37,10 +39,22 @@ const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
   const handleSendMessage = async () => {
     await sendMessage();
     setMessageContent("");
-    const messages = await getMessages();
-    if (messages) {
-      setMessages(messages);
-    }
+    const updatedMessages = await getMessages();
+    setMessages(updatedMessages);
+  };
+
+  const handleDeleteMessage = async () => {
+    await deleteMessage();
+    const updatedMessages = await getMessages();
+    setMessages(updatedMessages);
+  };
+
+  const handleMessageContextMenu = (
+    event: React.MouseEvent<HTMLDivElement>,
+    messageId: string
+  ) => {
+    event.preventDefault();
+    setSelectedMessageId(messageId);
   };
 
   return (
@@ -49,20 +63,28 @@ const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
         <button onClick={onClose}>Close</button>
       </div>
       <div className="messages">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`message ${message.sender === userId ? "sender" : ""}`}
-          >
+        {messages
+          .filter((message) => !message.is_deleted)
+          .map((message) => (
             <div
-              className={`message-content ${
-                message.sender === userId ? "sender" : ""
-              }`}
+              key={message.id}
+              className={`message ${message.sender === userId ? "sender" : ""}`}
+              onContextMenu={(event) =>
+                handleMessageContextMenu(event, message.id)
+              }
             >
-              {message.content}
+              <div
+                className={`message-content ${
+                  message.sender === userId ? "sender" : ""
+                }`}
+              >
+                {message.content}
+              </div>
+              {selectedMessageId === message.id && (
+                <button onClick={() => handleDeleteMessage()}>Delete</button>
+              )}
             </div>
-          </div>
-        ))}
+          ))}
       </div>
       <div className="message-input">
         <input

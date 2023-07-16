@@ -50,4 +50,5 @@ export interface IMessage {
   recipient: string;
   content: string;
   created_at: Date;
+  is_deleted: boolean;
 }

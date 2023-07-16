@@ -8,7 +8,12 @@ router.post("/", userController.checkAuth, messageController.sendMessage);
 router.get(
   "/:senderId/:recipientId",
   userController.checkAuth,
-  messageController.getMessagesBetweenUsers
+  messageController.getMessages
+);
+router.delete(
+  "/:messageId",
+  userController.checkAuth,
+  messageController.deleteMessage
 );
 
 module.exports = router;

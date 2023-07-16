@@ -9,13 +9,29 @@ class MessageService {
       message: messageDTO,
     };
   }
-  async getMessagesBetweenUsers(senderId, recipientId) {
-    const messages = await MessageModel.getMessagesBetweenUsers(
-      senderId,
-      recipientId
-    );
+
+  async getMessages(senderId, recipientId) {
+    const messages = await MessageModel.find({
+      $or: [
+        { sender: senderId, recipient: recipientId },
+        { sender: recipientId, recipient: senderId },
+      ],
+    }).sort({ created_at: 1 });
+
     return messages.map((message) => new MessageDTO(message));
   }
+
+  async deleteMessage(messageId) {
+    const message = await MessageModel.findById(messageId);
+    if (!message) {
+      throw new Error("Message not found");
+    }
+
+    message.is_deleted = true;
+    await message.save();
+  }
+
+  
 }
 
 module.exports = new MessageService();
