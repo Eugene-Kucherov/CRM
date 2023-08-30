@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import useFetch from "../../hooks/useFetch";
 import { IDialog, IUserDetails } from "../../types";
 import DialogWindow from "../../components/DialogWindow/DialogWindow";
+import { io } from "socket.io-client";
 
 const MessagesPage = () => {
   const [searchName, setSearchName] = useState("");
@@ -47,11 +48,9 @@ const MessagesPage = () => {
         onChange={(e) => setSearchName(e.target.value)}
       />
       <div>
-        {dialogs.map((dialog) => (
-          <div key={Date.now()}>
-            {dialog.lastMessage.content}
-          </div>
-        ))}
+        {/* {dialogs.map((dialog) => (
+          <div key={Date.now()}>{dialog.lastMessage.content}</div>
+        ))} */}
       </div>
       <div>
         {searchResults.map((user) => (

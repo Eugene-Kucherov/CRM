@@ -6,7 +6,6 @@ class MessageService {
   async sendMessage(messageData) {
     const message = await MessageModel.create(messageData);
 
-    // Update the dialogue with the last message
     await DialogueModel.findOneAndUpdate(
       { user: message.sender },
       { lastMessage: message },
@@ -39,7 +38,6 @@ class MessageService {
     message.is_deleted = true;
     await message.save();
 
-    // Update the dialogue with the new last message
     await DialogueModel.findOneAndUpdate(
       { user: message.sender },
       { lastMessage: message },
@@ -49,7 +47,7 @@ class MessageService {
 
   async getDialogues() {
     const dialogues = await DialogueModel.find()
-      .populate("user", "username") // Populate the user field with the username
+      .populate("user", "username")
       .populate({
         path: "lastMessage",
         populate: {

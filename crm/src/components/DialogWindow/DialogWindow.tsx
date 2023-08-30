@@ -3,6 +3,7 @@ import { IMessage } from "../../types";
 import { IUserDetails } from "../../types";
 import useFetch from "../../hooks/useFetch";
 import "./dialogWindow.scss";
+import { Socket, io } from "socket.io-client";
 
 interface DialogWindowProps {
   selectedUser: IUserDetails;
@@ -15,6 +16,8 @@ const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
     null
   );
+  const [socket, setSocket] = useState<Socket | null>(null);
+
   const userId = JSON.parse(localStorage.getItem("userId")!);
   const messageData = {
     sender: userId,
@@ -29,6 +32,34 @@ const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
   const deleteMessage = useFetch("delete", `/messages/${selectedMessageId}`);
 
   useEffect(() => {
+    const socket = io("http://localhost:5000");
+
+    setSocket(socket);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("message", (newMessage: IMessage) => {
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      });
+
+      socket.on("messageDeleted", (deletedMessageId: string | null) => {
+        setMessages((prevMessages) =>
+          prevMessages.map((message) =>
+            message.id === deletedMessageId
+              ? { ...message, is_deleted: true }
+              : message
+          )
+        );
+      });
+    }
+  }, [socket]);
+
+  useEffect(() => {
     const fetchMessages = async () => {
       const messages = await getMessages();
       setMessages(messages);
@@ -39,14 +70,18 @@ const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
   const handleSendMessage = async () => {
     await sendMessage();
     setMessageContent("");
+    if (socket) {
+      socket.emit("sendMessage", messageData);
+    }
     const updatedMessages = await getMessages();
     setMessages(updatedMessages);
   };
 
   const handleDeleteMessage = async () => {
     await deleteMessage();
-    const updatedMessages = await getMessages();
-    setMessages(updatedMessages);
+    if (socket) {
+      socket.emit("deleteMessage", selectedMessageId);
+    }
   };
 
   const handleMessageContextMenu = (
