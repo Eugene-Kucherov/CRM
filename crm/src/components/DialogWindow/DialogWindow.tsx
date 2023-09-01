@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { IMessage } from "../../types";
 import { IUserDetails } from "../../types";
-import useFetch from "../../hooks/useFetch";
 import "./dialogWindow.scss";
 import { Socket, io } from "socket.io-client";
 
@@ -24,12 +23,6 @@ const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
     recipient: selectedUser._id,
     content: messageContent,
   };
-  const sendMessage = useFetch("post", "/messages", messageData);
-  const getMessages = useFetch(
-    "get",
-    `/messages/${userId}/${selectedUser._id}`
-  );
-  const deleteMessage = useFetch("delete", `/messages/${selectedMessageId}`);
 
   useEffect(() => {
     const socket = io("http://localhost:5000");
@@ -43,6 +36,15 @@ const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
 
   useEffect(() => {
     if (socket) {
+      socket.emit("getMessages", {
+        senderId: userId,
+        recipientId: selectedUser._id,
+      });
+
+      socket.on("messages", (receivedMessages: Array<IMessage>) => {
+        setMessages(receivedMessages);
+      });
+
       socket.on("message", (newMessage: IMessage) => {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       });
@@ -59,26 +61,14 @@ const DialogWindow = ({ selectedUser, onClose }: DialogWindowProps) => {
     }
   }, [socket]);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      const messages = await getMessages();
-      setMessages(messages);
-    };
-    fetchMessages();
-  }, []);
-
-  const handleSendMessage = async () => {
-    await sendMessage();
-    setMessageContent("");
+  const handleSendMessage = () => {
     if (socket) {
       socket.emit("sendMessage", messageData);
     }
-    const updatedMessages = await getMessages();
-    setMessages(updatedMessages);
+    setMessageContent("");
   };
 
-  const handleDeleteMessage = async () => {
-    await deleteMessage();
+  const handleDeleteMessage = () => {
     if (socket) {
       socket.emit("deleteMessage", selectedMessageId);
     }

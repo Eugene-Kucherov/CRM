@@ -6,16 +6,14 @@ class MessageService {
   async sendMessage(messageData) {
     const message = await MessageModel.create(messageData);
 
-    await DialogueModel.findOneAndUpdate(
-      { user: message.sender },
-      { lastMessage: message },
-      { upsert: true }
-    );
+    // await DialogueModel.findOneAndUpdate(
+    //   { user: message.sender },
+    //   { lastMessage: message },
+    //   { upsert: true }
+    // );
 
     const messageDTO = new MessageDTO(message);
-    return {
-      message: messageDTO,
-    };
+    return messageDTO;
   }
 
   async getMessages(senderId, recipientId) {
@@ -38,11 +36,11 @@ class MessageService {
     message.is_deleted = true;
     await message.save();
 
-    await DialogueModel.findOneAndUpdate(
-      { user: message.sender },
-      { lastMessage: message },
-      { upsert: true }
-    );
+    // await DialogueModel.findOneAndUpdate(
+    //   { user: message.sender },
+    //   { lastMessage: message },
+    //   { upsert: true }
+    // );
   }
 
   async getDialogues() {
