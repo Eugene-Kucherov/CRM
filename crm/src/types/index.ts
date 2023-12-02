@@ -46,14 +46,24 @@ export interface IDeal {
 
 export interface IMessage {
   id: string;
-  sender: string;
-  recipient: string;
+  sender: IUserDetails;
+  recipient: IUserDetails;
   content: string;
   created_at: Date;
   is_deleted: boolean;
+  is_read: boolean;
 }
 
-export interface IDialog {
+export interface IDialoguePartner {
   user: IUserDetails;
+  username: string;
+  photo: string;
+}
+
+export interface IDialogue {
+  _id: string;
+  dialoguePartners: Array<IDialoguePartner>;
+  participants: Array<IUserDetails>;
   lastMessage: IMessage;
+  unreadNumber: number;
 }

@@ -13,13 +13,23 @@ const webSocket = (server) => {
   io.on("connection", (socket) => {
     console.log("A user connected");
 
-    socket.on("getMessages", async ({ senderId, recipientId }) => {
+    socket.on("joinRoom", (dialogueId) => {
+      socket.join(dialogueId);
+    });
+
+    socket.on("getDialogues", async (userId) => {
       try {
-        const messages = await MessageService.getMessages(
-          senderId,
-          recipientId
-        );
-        io.emit("messages", messages);
+        const dialogues = await MessageService.getDialogues(userId);
+        socket.emit("dialogues", dialogues);
+      } catch (error) {
+        console.error("Failed to get dialogues:", error);
+      }
+    });
+
+    socket.on("getMessages", async ({ dialogueId, userId }) => {
+      try {
+        const messages = await MessageService.getMessages(dialogueId, userId);
+        io.to(dialogueId.toString()).emit("messages", messages);
       } catch (error) {
         console.error("Failed to get messages:", error);
       }
@@ -28,7 +38,7 @@ const webSocket = (server) => {
     socket.on("sendMessage", async (messageData) => {
       try {
         const message = await MessageService.sendMessage(messageData);
-        io.emit("message", message);
+        io.to(message.dialogue.toString()).emit("message", message);
       } catch (error) {
         console.error("Failed to send message:", error);
       }
@@ -37,7 +47,6 @@ const webSocket = (server) => {
     socket.on("deleteMessage", async (messageId) => {
       try {
         await MessageService.deleteMessage(messageId);
-
         io.emit("messageDeleted", messageId);
       } catch (error) {
         console.error("Failed to delete message:", error);

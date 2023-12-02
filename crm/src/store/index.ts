@@ -4,6 +4,7 @@ import languageReducer from "./languageSlice";
 import calendarReducer from "./calendarSlice";
 import dealsReducer from "./dealsSlice";
 import initialsReducer from "./initialsSlice";
+import socketReducer from "./socketSlice";
 import { TypedUseSelectorHook, useSelector } from "react-redux";
 
 export const store = configureStore({
@@ -13,6 +14,7 @@ export const store = configureStore({
     initials: initialsReducer,
     calendar: calendarReducer,
     deals: dealsReducer,
+    socket: socketReducer,
   },
 });
 

@@ -6,7 +6,8 @@ const messageSchema = new Schema({
   content: { type: String, required: true },
   created_at: { type: Date, default: Date.now },
   is_deleted: { type: Boolean, default: false },
-  dialogue: { type: Schema.Types.ObjectId, ref: "Dialogue"},
+  is_read: { type: Boolean, default: false },
+  dialogue: { type: Schema.Types.ObjectId, ref: "Dialogue" },
 });
 
 module.exports = model("Message", messageSchema);

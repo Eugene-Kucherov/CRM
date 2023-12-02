@@ -5,6 +5,8 @@ module.exports = class MessageDTO {
   content;
   created_at;
   is_deleted;
+  is_read;
+  dialogue;
 
   constructor(model) {
     this.id = model._id;
@@ -13,5 +15,7 @@ module.exports = class MessageDTO {
     this.content = model.content;
     this.created_at = model.created_at;
     this.is_deleted = model.is_deleted;
+    this.is_read = model.is_read;
+    this.dialogue = model.dialogue;
   }
 };
