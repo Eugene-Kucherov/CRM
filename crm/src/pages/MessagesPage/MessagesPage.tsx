@@ -26,10 +26,8 @@ const MessagesPage = () => {
       socket.emit("getDialogues", userId);
       socket.on("dialogues", (receivedDialogues: Array<IDialogue>) => {
         setDialogues(receivedDialogues);
-        receivedDialogues.forEach((dialogue) => {
-          socket.emit("joinRoom", dialogue._id);
-        });
       });
+      ///socket.off
     }
   }, [socket, userId, dialogues]);
 
@@ -51,7 +49,7 @@ const MessagesPage = () => {
         dialoguePartner.username
           .toLowerCase()
           .includes(searchName.toLowerCase()) ||
-        dialogue.lastMessage.content
+        dialogue.lastMessage?.content
           .toLowerCase()
           .includes(searchName.toLowerCase())
       );
@@ -66,8 +64,21 @@ const MessagesPage = () => {
   };
 
   const handleUserClick = (user: IUserDetails, dialogueId?: string) => {
-    setSelectedUser(user);
-    if (dialogueId) setSelectedDialogueId(dialogueId);
+    if (socket && user && !dialogueId) {
+      socket.emit("createDialogue", {
+        senderId: userId,
+        recipientId: user._id,
+      });
+      socket.on("dialogueCreated", (dialogue) => {
+        setSelectedDialogueId(dialogue._id);
+        setSelectedUser(user);
+      });
+    }
+
+    if (dialogueId) {
+      setSelectedUser(user);
+      setSelectedDialogueId(dialogueId);
+    }
   };
 
   const getDialoguePartner = (dialogue: IDialogue) => {
@@ -101,61 +112,74 @@ const MessagesPage = () => {
     <section className="messages-page">
       <div className="dialogues">
         <input
+          className="dialogues__search"
           type="text"
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
+          placeholder="Search"
         />
         <div>
-          {(searchName ? searchResults : dialogues).map((dialogue) => (
-            <div
-              className={`dialogue ${
-                selectedUser &&
-                getDialoguePartner(dialogue).user._id === selectedUser._id
-                  ? "active"
-                  : ""
-              }`}
-              key={dialogue._id}
-              onClick={() =>
-                handleUserClick(getDialoguePartner(dialogue).user, dialogue._id)
-              }
-            >
-              <div className="dialogue-photo">
-                {getDialoguePartner(dialogue).photo ? (
-                  <img src={getDialoguePartner(dialogue).photo} alt="" />
-                ) : (
-                  <Avatar alt="" className="avatar" />
-                )}
-              </div>
-              <div className="dialogue-content">
-                <div className="dialogue-content-head">
-                  <span className="dialogue-content-head__name">
-                    {getDialoguePartner(dialogue).username}
-                  </span>
-                  <span className="dialogue-content-head__time">
-                    {formatMessageTime(dialogue.lastMessage.created_at)}
-                  </span>
-                </div>
-                <div className="dialogue-content-body">
-                  <span
-                    className={`dialogue-content-body__last-message ${
-                      dialogue.lastMessage.recipient._id === userId &&
-                      !dialogue.lastMessage.is_read
-                        ? "bold"
-                        : ""
-                    }`}
-                  >
-                    {dialogue.lastMessage.content}
-                  </span>
-                  {dialogue.lastMessage.recipient._id === userId &&
-                    dialogue.unreadNumber > 0 && (
-                      <div className="dialogue-content-body__unread-number">
-                        {dialogue.unreadNumber}
+          {(searchName ? searchResults : dialogues).map(
+            (dialogue) =>
+              (dialogue.lastMessage ||
+                (!dialogue.lastMessage && dialogue.creator === userId)) && (
+                <div
+                  className={`dialogue ${
+                    selectedUser &&
+                    getDialoguePartner(dialogue).user._id === selectedUser._id
+                      ? "active"
+                      : ""
+                  }`}
+                  key={dialogue._id}
+                  onClick={() =>
+                    handleUserClick(
+                      getDialoguePartner(dialogue).user,
+                      dialogue._id
+                    )
+                  }
+                >
+                  <div className="dialogue-photo">
+                    {getDialoguePartner(dialogue).photo ? (
+                      <img src={getDialoguePartner(dialogue).photo} alt="" />
+                    ) : (
+                      <Avatar alt="" className="avatar" />
+                    )}
+                  </div>
+                  <div className="dialogue-content">
+                    <div className="dialogue-content-head">
+                      <span className="dialogue-content-head__name">
+                        {getDialoguePartner(dialogue).username}
+                      </span>
+                      {dialogue.lastMessage && (
+                        <span className="dialogue-content-head__time">
+                          {formatMessageTime(dialogue.lastMessage.created_at)}
+                        </span>
+                      )}
+                    </div>
+                    {dialogue.lastMessage && (
+                      <div className="dialogue-content-body">
+                        <span
+                          className={`dialogue-content-body__last-message ${
+                            dialogue.lastMessage.recipient._id === userId &&
+                            !dialogue.lastMessage.is_read
+                              ? "bold"
+                              : ""
+                          }`}
+                        >
+                          {dialogue.lastMessage.content}
+                        </span>
+                        {dialogue.lastMessage.recipient._id === userId &&
+                          dialogue.unreadNumber > 0 && (
+                            <div className="dialogue-content-body__unread-number">
+                              {dialogue.unreadNumber}
+                            </div>
+                          )}
                       </div>
                     )}
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              )
+          )}
         </div>
         <div>
           {globalResults.map((user) => (

@@ -50,6 +50,7 @@ export interface IMessage {
   recipient: IUserDetails;
   content: string;
   created_at: Date;
+  updated_at: Date | null;
   is_deleted: boolean;
   is_read: boolean;
 }
@@ -62,6 +63,7 @@ export interface IDialoguePartner {
 
 export interface IDialogue {
   _id: string;
+  creator: string;
   dialoguePartners: Array<IDialoguePartner>;
   participants: Array<IUserDetails>;
   lastMessage: IMessage;

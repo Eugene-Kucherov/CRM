@@ -11,10 +11,18 @@ const webSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("A user connected");
+    console.log("An user connected");
 
-    socket.on("joinRoom", (dialogueId) => {
-      socket.join(dialogueId);
+    socket.on("createDialogue", async ({ senderId, recipientId }) => {
+      try {
+        const dialogue = await MessageService.createDialogue(
+          senderId,
+          recipientId
+        );
+        socket.emit("dialogueCreated", dialogue);
+      } catch (error) {
+        console.error("Failed to create dialogue:", error);
+      }
     });
 
     socket.on("getDialogues", async (userId) => {
@@ -29,7 +37,7 @@ const webSocket = (server) => {
     socket.on("getMessages", async ({ dialogueId, userId }) => {
       try {
         const messages = await MessageService.getMessages(dialogueId, userId);
-        io.to(dialogueId.toString()).emit("messages", messages);
+        socket.emit("messages", messages);
       } catch (error) {
         console.error("Failed to get messages:", error);
       }
@@ -38,16 +46,28 @@ const webSocket = (server) => {
     socket.on("sendMessage", async (messageData) => {
       try {
         const message = await MessageService.sendMessage(messageData);
-        io.to(message.dialogue.toString()).emit("message", message);
+        socket.emit("message", message);
       } catch (error) {
         console.error("Failed to send message:", error);
+      }
+    });
+
+    socket.on("updateMessage", async ({ messageId, updatedContent }) => {
+      try {
+        const updatedMessage = await MessageService.updateMessage(
+          messageId,
+          updatedContent
+        );
+        socket.emit("messageUpdated", updatedMessage);
+      } catch (error) {
+        console.error("Failed to update message:", error);
       }
     });
 
     socket.on("deleteMessage", async (messageId) => {
       try {
         await MessageService.deleteMessage(messageId);
-        io.emit("messageDeleted", messageId);
+        socket.emit("messageDeleted", messageId);
       } catch (error) {
         console.error("Failed to delete message:", error);
       }

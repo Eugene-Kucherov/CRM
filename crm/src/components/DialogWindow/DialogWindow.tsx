@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { IMessage } from "../../types";
 import { IUserDetails } from "../../types";
 import "./dialogWindow.scss";
 import { useTypedSelector } from "../../store";
 import DoneIcon from "@mui/icons-material/Done";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface DialogWindowProps {
   selectedUser: IUserDetails;
@@ -22,6 +24,9 @@ const DialogWindow = ({
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
     null
   );
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const socket = useTypedSelector((state) => state.socket.socket);
 
@@ -32,32 +37,31 @@ const DialogWindow = ({
     content: messageContent,
   };
 
+  const handleClickOutsideContextMenu = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    const isInsideContextMenu = target.closest(".context-menu");
+
+    if (!isInsideContextMenu) {
+      setIsContextMenuOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isContextMenuOpen) {
+      document.addEventListener("click", handleClickOutsideContextMenu);
+    } else {
+      document.removeEventListener("click", handleClickOutsideContextMenu);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutsideContextMenu);
+    };
+  }, [isContextMenuOpen]);
+
   useEffect(() => {
     if (socket) {
       const handleMessages = (receivedMessages: Array<IMessage>) => {
         setMessages(receivedMessages);
-      };
-
-      const handleNewMessage = (newMessage: IMessage) => {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-        socket.emit("getMessages", {
-          dialogueId: selectedDialogueId,
-          userId,
-        });
-      };
-
-      const handleDeletedMessage = (deletedMessageId: string | null) => {
-        setMessages((prevMessages) =>
-          prevMessages.map((message) =>
-            message.id === deletedMessageId
-              ? { ...message, is_deleted: true }
-              : message
-          )
-        );
-        socket.emit("getMessages", {
-          dialogueId: selectedDialogueId,
-          userId,
-        });
       };
 
       socket.emit("getMessages", {
@@ -66,16 +70,12 @@ const DialogWindow = ({
       });
 
       socket.on("messages", handleMessages);
-      socket.on("message", handleNewMessage);
-      socket.on("messageDeleted", handleDeletedMessage);
 
       return () => {
         socket.off("messages", handleMessages);
-        socket.off("message", handleNewMessage);
-        socket.off("messageDeleted", handleDeletedMessage);
       };
     }
-  }, [socket, selectedUser._id, userId]);
+  }, [socket, selectedUser._id, userId, selectedDialogueId, messages]);
 
   const handleSendMessage = () => {
     if (socket) {
@@ -86,10 +86,31 @@ const DialogWindow = ({
     setMessageContent("");
   };
 
+  const handleEditMode = (content: string) => {
+    setIsEditMode(true);
+    setMessageContent(content);
+    setIsContextMenuOpen(false);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  const handleUpdateMessage = () => {
+    if (socket) {
+      socket.emit("updateMessage", {
+        messageId: selectedMessageId,
+        updatedContent: messageContent,
+      });
+    }
+    setIsEditMode(false);
+    setMessageContent("");
+  };
+
   const handleDeleteMessage = () => {
     if (socket) {
       socket.emit("deleteMessage", selectedMessageId);
     }
+    setIsContextMenuOpen(false);
   };
 
   const handleMessageContextMenu = (
@@ -98,10 +119,11 @@ const DialogWindow = ({
   ) => {
     event.preventDefault();
     setSelectedMessageId(messageId);
+    setIsContextMenuOpen(true);
   };
 
-  const formatMessageTime = (timestamp: Date) => {
-    const messageDate = new Date(timestamp);
+  const formatMessageTime = (createdAt: Date, updatedAt: Date | null) => {
+    const messageDate = new Date(createdAt);
 
     const hours = messageDate.getHours();
     const minutes = messageDate.getMinutes();
@@ -109,21 +131,24 @@ const DialogWindow = ({
     const formattedHours = hours < 10 ? `0${hours}` : hours;
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
 
-    return `${formattedHours}:${formattedMinutes}`;
+    return updatedAt
+      ? `edited ${formattedHours}:${formattedMinutes}`
+      : `${formattedHours}:${formattedMinutes}`;
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-
-      handleSendMessage();
+      isEditMode ? handleUpdateMessage() : handleSendMessage();
     }
   };
 
   return (
     <div className="dialog-window">
       <div className="header">
-        <button onClick={onClose}>Close</button>
+        <button className="dialogue-close" onClick={onClose}>
+          Close
+        </button>
       </div>
       <div className="messages">
         {messages
@@ -132,18 +157,18 @@ const DialogWindow = ({
             <div
               key={message.id}
               className={`message ${message.sender === userId ? "sender" : ""}`}
-              onContextMenu={(event) =>
-                handleMessageContextMenu(event, message.id)
-              }
             >
               <div
                 className={`message-content ${
                   message.sender === userId ? "sender" : ""
                 }`}
+                onContextMenu={(event) =>
+                  handleMessageContextMenu(event, message.id)
+                }
               >
                 <span className="message-text">{message.content}</span>
                 <span className="message-time">
-                  {formatMessageTime(message.created_at)}
+                  {formatMessageTime(message.created_at, message.updated_at)}
                 </span>
                 {message.sender === userId && (
                   <div className="message-status">
@@ -154,21 +179,39 @@ const DialogWindow = ({
                     )}
                   </div>
                 )}
+                {isContextMenuOpen &&
+                  selectedMessageId === message.id &&
+                  message.sender === userId && (
+                    <div className="context-menu">
+                      <button
+                        className="context-menu__action"
+                        onClick={() => handleEditMode(message.content)}
+                      >
+                        <EditIcon fontSize="small" /> Edit
+                      </button>
+                      <button
+                        className="context-menu__action"
+                        onClick={() => handleDeleteMessage()}
+                      >
+                        <DeleteIcon fontSize="small" /> Delete
+                      </button>
+                    </div>
+                  )}
               </div>
-              {selectedMessageId === message.id && (
-                <button onClick={() => handleDeleteMessage()}>Delete</button>
-              )}
             </div>
           ))}
       </div>
       <div className="message-input">
         <input
+          ref={inputRef}
           type="text"
           value={messageContent}
           onChange={(e) => setMessageContent(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button onClick={handleSendMessage}>Send</button>
+        <button onClick={isEditMode ? handleUpdateMessage : handleSendMessage}>
+          Send
+        </button>
       </div>
     </div>
   );

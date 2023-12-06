@@ -11,14 +11,39 @@ class MessageService {
 
     const participants = [message.sender, message.recipient].map(String).sort();
 
+    const existingDialogue = await DialogueModel.findOne({ participants });
+
+    if (existingDialogue) {
+      existingDialogue.lastMessage = message;
+      await existingDialogue.save();
+      message.dialogue = existingDialogue._id;
+      await message.save();
+    }
+
+    const messageDTO = new MessageDTO(message);
+    return messageDTO;
+  }
+
+  async createDialogue(senderId, recipientId) {
+    const participants = [senderId, recipientId].sort();
+
+    const existingDialogue = await DialogueModel.findOne({ participants });
+
+    if (existingDialogue) {
+      return existingDialogue;
+    }
+
+    const objSenderId = new Types.ObjectId(senderId);
+    const objRecipientId = new Types.ObjectId(recipientId);
+
     const [sender, recipient] = await Promise.all([
-      UserModel.findById(message.sender),
-      UserModel.findById(message.recipient),
+      UserModel.findById(objSenderId),
+      UserModel.findById(objRecipientId),
     ]);
 
     const [senderPhoto, recipientPhoto] = await Promise.all([
-      PhotoModel.findOne({ userId: message.sender }),
-      PhotoModel.findOne({ userId: message.recipient }),
+      PhotoModel.findOne({ userId: objSenderId }),
+      PhotoModel.findOne({ userId: objRecipientId }),
     ]);
 
     const SenderPhotoData = senderPhoto
@@ -35,36 +60,25 @@ class MessageService {
 
     const dialoguePartners = [
       {
-        user: message.sender,
+        user: senderId,
         username: sender.name,
         photo: SenderPhotoData,
       },
       {
-        user: message.recipient,
+        user: recipientId,
         username: recipient.name,
         photo: RecipientPhotoData,
       },
     ];
 
-    const existingDialogue = await DialogueModel.findOne({ participants });
+    const newDialogue = await DialogueModel.create({
+      creator: senderId,
+      participants,
+      dialoguePartners,
+      lastMessage: null,
+    });
 
-    if (existingDialogue) {
-      existingDialogue.lastMessage = message;
-      await existingDialogue.save();
-      message.dialogue = existingDialogue._id;
-      await message.save();
-    } else {
-      const newDialogue = await DialogueModel.create({
-        participants,
-        dialoguePartners,
-        lastMessage: message,
-      });
-      message.dialogue = newDialogue._id;
-      await message.save();
-    }
-
-    const messageDTO = new MessageDTO(message);
-    return messageDTO;
+    return newDialogue;
   }
 
   async getMessages(dialogueId, userId) {
@@ -82,6 +96,21 @@ class MessageService {
     );
 
     return messages.map((message) => new MessageDTO(message));
+  }
+
+  async updateMessage(messageId, updatedContent) {
+    const message = await MessageModel.findById(messageId);
+
+    if (!message) {
+      throw new Error("Message not found");
+    }
+
+    message.content = updatedContent;
+    message.updated_at = new Date();
+
+    await message.save();
+
+    return new MessageDTO(message);
   }
 
   async deleteMessage(messageId) {
@@ -134,6 +163,7 @@ class MessageService {
     const objDialogue = new Types.ObjectId(dialogueId);
     const unreadCount = await MessageModel.countDocuments({
       dialogue: objDialogue,
+      is_deleted: false,
       is_read: false,
     });
 

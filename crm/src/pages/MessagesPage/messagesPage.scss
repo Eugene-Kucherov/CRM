@@ -5,6 +5,14 @@
   padding: 70px 100px 50px 50px;
   .dialogues {
     width: 250px;
+    &__search {
+      padding: 5px 10px;
+      margin: 0 auto 10px;
+      display: block;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+    }
     .dialogue {
       padding: 7px;
       display: flex;

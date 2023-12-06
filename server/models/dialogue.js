@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 
 const dialogueSchema = new Schema({
+  creator: { type: String, required: true },
   participants: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
   dialoguePartners: [
     {
@@ -9,8 +10,8 @@ const dialogueSchema = new Schema({
       photo: { type: String, ref: "Photo" },
     },
   ],
-  lastMessage: { type: Schema.Types.ObjectId, ref: "Message", required: true },
-  unreadNumber: { type: Number},
+  lastMessage: { type: Schema.Types.ObjectId, ref: "Message" },
+  unreadNumber: { type: Number },
 });
 
 module.exports = model("Dialogue", dialogueSchema);

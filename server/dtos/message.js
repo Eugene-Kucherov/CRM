@@ -4,6 +4,7 @@ module.exports = class MessageDTO {
   recipient;
   content;
   created_at;
+  updated_at;
   is_deleted;
   is_read;
   dialogue;
@@ -14,6 +15,7 @@ module.exports = class MessageDTO {
     this.recipient = model.recipient;
     this.content = model.content;
     this.created_at = model.created_at;
+    this.updated_at = model.updated_at;
     this.is_deleted = model.is_deleted;
     this.is_read = model.is_read;
     this.dialogue = model.dialogue;
