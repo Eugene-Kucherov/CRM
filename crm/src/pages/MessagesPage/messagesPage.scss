@@ -4,14 +4,31 @@
   display: flex;
   padding: 70px 100px 50px 50px;
   .dialogues {
-    width: 250px;
+    width: 270px;
     &__search {
-      padding: 5px 10px;
-      margin: 0 auto 10px;
-      display: block;
-      border: none;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       border-radius: 10px;
-      outline: none;
+      background-color: #ffffff;
+      &-input {
+        padding: 5px 10px;
+        display: block;
+        border: none;
+        border-radius: inherit;
+        outline: none;
+      }
+      &-switcher {
+        padding: 5px 10px;
+        background-color: inherit;
+        border: none;
+        border-radius: inherit;
+        &:hover {
+          cursor: pointer;
+          background-color: $green;
+        }
+      }
     }
     .dialogue {
       padding: 7px;

@@ -26,8 +26,11 @@ const DialogWindow = ({
   );
   const [isEditMode, setIsEditMode] = useState(false);
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
+  const [isPartnerTyping, setIsPartnerTyping] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [typingName, setTypingName] = useState("");
 
+  const name = useTypedSelector((state) => state.initials.name);
   const socket = useTypedSelector((state) => state.socket.socket);
 
   const userId = JSON.parse(localStorage.getItem("userId")!);
@@ -143,6 +146,46 @@ const DialogWindow = ({
     }
   };
 
+  const sendTypingEvent = (isTyping: boolean) => {
+    if (socket) {
+      socket.emit("typing", { dialogueId: selectedDialogueId, isTyping, name });
+    }
+  };
+
+  useEffect(() => {
+    if (socket) {
+      const handlePartnerTyping = ({
+        isTyping,
+        name,
+      }: {
+        isTyping: boolean;
+        name: string;
+      }) => {
+        setIsPartnerTyping(isTyping);
+        setTypingName(name);
+      };
+
+      socket.on("partnerTyping", handlePartnerTyping);
+      socket.emit("joinRoom", selectedDialogueId);
+
+      return () => {
+        socket.off("partnerTyping", handlePartnerTyping);
+        socket.emit("leaveRoom", selectedDialogueId);
+        sendTypingEvent(false);
+        setMessageContent("");
+      };
+    }
+  }, [socket, selectedDialogueId]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessageContent(e.target.value);
+
+    if (socket) {
+      const isTyping = e.target.value.length > 0;
+      sendTypingEvent(isTyping);
+    }
+  };
+
   return (
     <div className="dialog-window">
       <div className="header">
@@ -201,12 +244,13 @@ const DialogWindow = ({
             </div>
           ))}
       </div>
+      {isPartnerTyping && <div>{typingName} is typing...</div>}
       <div className="message-input">
         <input
           ref={inputRef}
           type="text"
           value={messageContent}
-          onChange={(e) => setMessageContent(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
         />
         <button onClick={isEditMode ? handleUpdateMessage : handleSendMessage}>

@@ -13,6 +13,14 @@ const webSocket = (server) => {
   io.on("connection", (socket) => {
     console.log("An user connected");
 
+    socket.on("joinRoom", (dialogueId) => {
+      socket.join(dialogueId);
+    });
+
+    socket.on("leaveRoom", (dialogueId) => {
+      socket.leave(dialogueId);
+    });
+
     socket.on("createDialogue", async ({ senderId, recipientId }) => {
       try {
         const dialogue = await MessageService.createDialogue(
@@ -31,6 +39,18 @@ const webSocket = (server) => {
         socket.emit("dialogues", dialogues);
       } catch (error) {
         console.error("Failed to get dialogues:", error);
+      }
+    });
+
+    socket.on("searchDialogues", async ({ userId, searchText }) => {
+      try {
+        const matchingDialogues = await MessageService.searchDialogues(
+          userId,
+          searchText
+        );
+        socket.emit("matchingDialogues", matchingDialogues);
+      } catch (error) {
+        console.error("Failed to search messages:", error);
       }
     });
 
@@ -71,6 +91,10 @@ const webSocket = (server) => {
       } catch (error) {
         console.error("Failed to delete message:", error);
       }
+    });
+
+    socket.on("typing", ({ dialogueId, isTyping, name }) => {
+      socket.to(dialogueId).emit("partnerTyping", { isTyping, name });
     });
 
     socket.on("disconnect", () => {

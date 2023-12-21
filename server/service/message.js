@@ -105,10 +105,11 @@ class MessageService {
       throw new Error("Message not found");
     }
 
-    message.content = updatedContent;
-    message.updated_at = new Date();
-
-    await message.save();
+    if (updatedContent !== "" && message.content !== updatedContent) {
+      message.content = updatedContent;
+      message.updated_at = new Date();
+      await message.save();
+    }
 
     return new MessageDTO(message);
   }
@@ -168,6 +169,36 @@ class MessageService {
     });
 
     return unreadCount;
+  }
+
+  async searchDialogues(userId, searchText) {
+    const dialogues = await this.getDialogues(userId);
+
+    const messages = await MessageModel.find({
+      content: { $regex: new RegExp(searchText, "i") },
+      is_deleted: false,
+    });
+
+    const users = await UserModel.find({
+      name: { $regex: new RegExp(searchText, "i") },
+    });
+
+    const dialoguesByUsers = await DialogueModel.find({
+      participants: { $in: users.map((user) => user._id) },
+    });
+
+    const dialogueIds = [
+      ...new Set([
+        ...messages.map((message) => message.dialogue.toString()),
+        ...dialoguesByUsers.map((dialogue) => dialogue._id.toString()),
+      ]),
+    ];
+
+    const filteredDialogues = dialogues.filter((dialogue) =>
+      dialogueIds.includes(dialogue._id.toString())
+    );
+
+    return filteredDialogues;
   }
 
   async getDialogue(dialogueId) {
